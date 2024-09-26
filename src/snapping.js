@@ -1,4 +1,4 @@
-import turf from "@turf/turf";
+import * as turf from "@turf/turf";
 
 const Snapping = (module.exports = function (ctx) {
   /*
