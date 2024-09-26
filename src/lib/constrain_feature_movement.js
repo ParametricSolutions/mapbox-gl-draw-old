@@ -1,5 +1,5 @@
-const extent = require('@mapbox/geojson-extent');
-const Constants = require('../constants');
+import extent from "@mapbox/geojson-extent";
+import Constants from "../constants";
 
 const {
   LAT_MIN,
@@ -7,14 +7,14 @@ const {
   LAT_RENDERED_MIN,
   LAT_RENDERED_MAX,
   LNG_MIN,
-  LNG_MAX
+  LNG_MAX,
 } = Constants;
 
 // Ensure that we do not drag north-south far enough for
 // - any part of any feature to exceed the poles
 // - any feature to be completely lost in the space between the projection's
 //   edge and the poles, such that it couldn't be re-selected and moved back
-module.exports = function(geojsonFeatures, delta) {
+module.exports = function (geojsonFeatures, delta) {
   // "inner edge" = a feature's latitude closest to the equator
   let northInnerEdge = LAT_MIN;
   let southInnerEdge = LAT_MAX;
@@ -39,7 +39,6 @@ module.exports = function(geojsonFeatures, delta) {
     if (featureEastEdge > eastEdge) eastEdge = featureEastEdge;
   });
 
-
   // These changes are not mutually exclusive: we might hit the inner
   // edge but also have hit the outer edge and therefore need
   // another readjustment
@@ -57,10 +56,12 @@ module.exports = function(geojsonFeatures, delta) {
     constrainedDelta.lat = LAT_MIN - southOuterEdge;
   }
   if (westEdge + constrainedDelta.lng <= LNG_MIN) {
-    constrainedDelta.lng += Math.ceil(Math.abs(constrainedDelta.lng) / 360) * 360;
+    constrainedDelta.lng +=
+      Math.ceil(Math.abs(constrainedDelta.lng) / 360) * 360;
   }
   if (eastEdge + constrainedDelta.lng >= LNG_MAX) {
-    constrainedDelta.lng -= Math.ceil(Math.abs(constrainedDelta.lng) / 360) * 360;
+    constrainedDelta.lng -=
+      Math.ceil(Math.abs(constrainedDelta.lng) / 360) * 360;
   }
 
   return constrainedDelta;

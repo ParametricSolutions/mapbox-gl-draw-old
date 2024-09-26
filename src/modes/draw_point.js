@@ -1,16 +1,16 @@
-const CommonSelectors = require('../lib/common_selectors');
-const Constants = require('../constants');
+import Constants from "../constants";
+import CommonSelectors from "../lib/common_selectors";
 
 const DrawPoint = {};
 
-DrawPoint.onSetup = function() {
+DrawPoint.onSetup = function () {
   const point = this.newFeature({
     type: Constants.geojsonTypes.FEATURE,
     properties: {},
     geometry: {
       type: Constants.geojsonTypes.POINT,
-      coordinates: []
-    }
+      coordinates: [],
+    },
   });
 
   this.addFeature(point);
@@ -20,45 +20,49 @@ DrawPoint.onSetup = function() {
   this.activateUIButton(Constants.types.POINT);
 
   this.setActionableState({
-    trash: true
+    trash: true,
   });
 
   return { point };
 };
 
-DrawPoint.stopDrawingAndRemove = function(state) {
+DrawPoint.stopDrawingAndRemove = function (state) {
   this.deleteFeature([state.point.id], { silent: true });
   this.changeMode(Constants.modes.SIMPLE_SELECT);
 };
 
-DrawPoint.onTap = DrawPoint.onClick = function(state, e) {
+DrawPoint.onTap = DrawPoint.onClick = function (state, e) {
   this.updateUIClasses({ mouse: Constants.cursors.MOVE });
   const lngLat = this._ctx.snapping.snapCoord(e.lngLat);
 
-  state.point.updateCoordinate('', lngLat.lng, lngLat.lat);
+  state.point.updateCoordinate("", lngLat.lng, lngLat.lat);
   this.map.fire(Constants.events.CREATE, {
-    features: [state.point.toGeoJSON()]
+    features: [state.point.toGeoJSON()],
   });
-  this.changeMode(Constants.modes.SIMPLE_SELECT, { featureIds: [state.point.id] });
+  this.changeMode(Constants.modes.SIMPLE_SELECT, {
+    featureIds: [state.point.id],
+  });
 };
 
-DrawPoint.onStop = function(state) {
+DrawPoint.onStop = function (state) {
   this.activateUIButton();
   if (!state.point.getCoordinate().length) {
     this.deleteFeature([state.point.id], { silent: true });
   }
 };
 
-DrawPoint.toDisplayFeatures = function(state, geojson, display) {
+DrawPoint.toDisplayFeatures = function (state, geojson, display) {
   // Never render the point we're drawing
   const isActivePoint = geojson.properties.id === state.point.id;
-  geojson.properties.active = (isActivePoint) ? Constants.activeStates.ACTIVE : Constants.activeStates.INACTIVE;
+  geojson.properties.active = isActivePoint
+    ? Constants.activeStates.ACTIVE
+    : Constants.activeStates.INACTIVE;
   if (!isActivePoint) return display(geojson);
 };
 
 DrawPoint.onTrash = DrawPoint.stopDrawingAndRemove;
 
-DrawPoint.onKeyUp = function(state, e) {
+DrawPoint.onKeyUp = function (state, e) {
   if (CommonSelectors.isEscapeKey(e) || CommonSelectors.isEnterKey(e)) {
     return this.stopDrawingAndRemove(state, e);
   }

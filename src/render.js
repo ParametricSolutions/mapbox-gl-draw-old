@@ -1,4 +1,4 @@
-const Constants = require("./constants");
+import Constants from "./constants";
 
 module.exports = function render() {
   const store = this;

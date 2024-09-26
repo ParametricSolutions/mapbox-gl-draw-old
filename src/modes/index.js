@@ -1,7 +1,7 @@
 module.exports = {
-  simple_select: require('./simple_select'),
-  direct_select: require('./direct_select'),
-  draw_point: require('./draw_point'),
-  draw_polygon: require('./draw_polygon'),
-  draw_line_string: require('./draw_line_string'),
+  simple_select: import("./simple_select"),
+  direct_select: import("./direct_select"),
+  draw_point: import("./draw_point"),
+  draw_polygon: import("./draw_polygon"),
+  draw_line_string: import("./draw_line_string"),
 };

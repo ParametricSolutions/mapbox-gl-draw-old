@@ -1,5 +1,7 @@
-const xtend = require("xtend");
-const Constants = require("./constants");
+import xtend from "xtend";
+import Constants from "./constants";
+import theme from "./lib/theme";
+import modes from "./modes";
 
 const defaultOptions = {
   defaultMode: Constants.modes.SIMPLE_SELECT,
@@ -9,8 +11,8 @@ const defaultOptions = {
   touchBuffer: 25,
   boxSelect: true,
   displayControlsDefault: true,
-  styles: require("./lib/theme"),
-  modes: require("./modes"),
+  styles: theme,
+  modes: modes,
   controls: {},
   userProperties: false,
   snapLayers: [],

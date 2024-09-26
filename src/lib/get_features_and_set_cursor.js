@@ -1,17 +1,19 @@
-const featuresAt = require('./features_at');
-const Constants = require('../constants');
+import featuresAt from "./features_at";
+import Constants from "../constants";
 
-module.exports = function getFeatureAtAndSetCursors(event, ctx) {
+export default function getFeatureAtAndSetCursors(event, ctx) {
   const features = featuresAt.click(event, null, ctx);
   const classes = { mouse: Constants.cursors.NONE };
 
   if (features[0]) {
-    classes.mouse = (features[0].properties.active === Constants.activeStates.ACTIVE) ?
-      Constants.cursors.MOVE : Constants.cursors.POINTER;
+    classes.mouse =
+      features[0].properties.active === Constants.activeStates.ACTIVE
+        ? Constants.cursors.MOVE
+        : Constants.cursors.POINTER;
     classes.feature = features[0].properties.meta;
   }
 
-  if (ctx.events.currentModeName().indexOf('draw') !== -1) {
+  if (ctx.events.currentModeName().indexOf("draw") !== -1) {
     classes.mouse = Constants.cursors.ADD;
   }
 
@@ -19,4 +21,4 @@ module.exports = function getFeatureAtAndSetCursors(event, ctx) {
   ctx.ui.updateMapClasses();
 
   return features[0];
-};
+}

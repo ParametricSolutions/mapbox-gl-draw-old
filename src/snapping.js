@@ -1,4 +1,5 @@
-const turf = require("@turf/turf");
+import turf from "@turf/turf";
+
 const Snapping = (module.exports = function (ctx) {
   /*
   this: snapping object, just this module
