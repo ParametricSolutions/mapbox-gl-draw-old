@@ -121,6 +121,33 @@ test('direct_select', (t) => {
     });
   });
 
+  t.test('direct_select - trashing vertices should delete the correct ones', (st) => {
+    const longLine = {
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'LineString',
+        coordinates: [[0, 0], [10, 0], [20, 0], [30, 0], [40, 0], [50, 0], [60, 0], [70, 0], [80, 0], [80, 10], [70, 10], [60, 10], [50, 10]]
+      }
+    };
+    const ids = Draw.add(longLine);
+    Draw.changeMode(Constants.modes.DIRECT_SELECT, {
+      featureId: ids[0]
+    });
+    afterNextRender(() => {
+      // select multiple nodes at indices 9, 10, 11
+      click(map, makeMouseEvent(70, 10, { shiftKey: true }));
+      click(map, makeMouseEvent(80, 10, { shiftKey: true }));
+      click(map, makeMouseEvent(60, 10, { shiftKey: true }));
+      afterNextRender(() => {
+        Draw.trash();
+        const afterTrash = Draw.get(ids[0]);
+        st.deepEqual(afterTrash.geometry.coordinates, [[0, 0], [10, 0], [20, 0], [30, 0], [40, 0], [50, 0], [60, 0], [70, 0], [80, 0], [50, 10]]);
+        cleanUp(() => st.end());
+      });
+    });
+  });
+
   t.test('direct_select - a click on a vertex and than dragging the map shouldn\'t drag the vertex', (st) => {
     const ids = Draw.add(getGeoJSON('polygon'));
     Draw.changeMode(Constants.modes.DIRECT_SELECT, {
@@ -243,6 +270,31 @@ test('direct_select', (t) => {
         st.deepEqual(Draw.getSelectedPoints().features[0].geometry.coordinates, endPosition, 'selection is accurate after dragging');
         cleanUp(() => st.end());
       });
+    });
+  });
+
+  t.test('direct_select - fire a selectionchange with the point provided in the coordPath', st => {
+    map.fire.reset();
+    const [lineId] = Draw.add(getGeoJSON('line'));
+
+    Draw.changeMode(Constants.modes.DIRECT_SELECT, {
+      featureId: lineId,
+      coordPath: '0'
+    });
+
+    afterNextRender(() => {
+      const [selectionArgs] = getFireArgs().filter(arg => arg[0] === Constants.events.SELECTION_CHANGE);
+      st.ok(selectionArgs, 'should have fired a selectionchange event');
+
+      if (selectionArgs) {
+        const [selectedFeature] = selectionArgs[1].features;
+        st.ok(selectedFeature && selectedFeature.id === lineId, 'should have selected the provided line');
+
+        const [selectedPoint] = selectionArgs[1].points;
+        st.deepEqual(selectedPoint.geometry.coordinates, selectedFeature.geometry.coordinates[0], 'should have selected the coordinate under the path');
+      }
+
+      cleanUp(() => st.end());
     });
   });
 
